@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useState } from 'react'
 import { contact } from '../data/site'
 import { FadeIn, Kicker, Photo, RiseText } from '../components/ui'
+import { useMediaQuery } from '../lib/hooks'
 import { easeOut } from '../lib/motion'
 
 const spots = [
@@ -158,6 +159,7 @@ export function Ash() {
   const { scrollYProgress } = useScroll({ target: cols, offset: ['start end', 'end start'] })
   const ya = useTransform(scrollYProgress, [0, 1], [60, -60])
   const yb = useTransform(scrollYProgress, [0, 1], [-40, 120])
+  const parallax = useMediaQuery('(min-width: 1024px)')
 
   return (
     <section id="eventi" className="relative bg-coal px-5 py-24 sm:px-12 sm:py-32 lg:px-20">
@@ -214,12 +216,12 @@ export function Ash() {
 
       <div className="mt-20 grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div ref={cols} className="grid grid-cols-2 gap-3 sm:gap-4">
-          <motion.div style={{ y: ya }} className="grid gap-3 sm:gap-4">
+          <motion.div style={parallax ? { y: ya } : undefined} className="grid gap-3 sm:gap-4">
             {columnA.map((n) => (
               <Photo key={n} name={n} small alt="Dettaglio della Sala Ash" className="aspect-[4/5] rounded-2xl" />
             ))}
           </motion.div>
-          <motion.div style={{ y: yb }} className="grid gap-3 pt-16 sm:gap-4">
+          <motion.div style={parallax ? { y: yb } : undefined} className="grid gap-3 pt-10 sm:gap-4 lg:pt-16">
             {columnB.map((n) => (
               <Photo key={n} name={n} small alt="Dettaglio della Sala Ash" className="aspect-[4/5] rounded-2xl" />
             ))}

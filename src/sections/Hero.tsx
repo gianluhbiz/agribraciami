@@ -332,7 +332,12 @@ function MobileHero() {
           </motion.div>
         </AnimatePresence>
 
-        <div role="tablist" aria-label="Scegli" className="mt-5 grid grid-cols-3 rounded-full bg-coal/55 p-1 ring-1 ring-cream/10 backdrop-blur-xl">
+        <div role="tablist" aria-label="Scegli" className="relative mt-5 grid grid-cols-3 rounded-full bg-coal/55 p-1 ring-1 ring-cream/10 backdrop-blur-xl">
+          <span
+            aria-hidden
+            className="absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/3)] rounded-full bg-cream transition-transform duration-300 ease-out-strong"
+            style={{ transform: `translateX(${i * 100}%)` }}
+          />
           {panels.map((panel, j) => (
             <button
               key={panel.key}
@@ -343,13 +348,6 @@ function MobileHero() {
                 j === i ? 'text-coal' : 'text-cream/70'
               }`}
             >
-              {j === i && (
-                <motion.span
-                  layoutId="hero-tab"
-                  className="absolute inset-0 rounded-full bg-cream"
-                  transition={{ type: 'spring', duration: 0.45, bounce: 0.15 }}
-                />
-              )}
               <i className={`${panel.icon} relative`} aria-hidden />
               <span className="relative">{panel.title.replace('.', '')}</span>
             </button>

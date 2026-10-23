@@ -266,12 +266,14 @@ export default function Menu() {
 
       <div id="carta" className="sticky top-0 z-30 border-y border-cream/10 bg-coal/85 backdrop-blur-xl transition-[top] duration-300 ease-out-strong [html[data-nav=shown]_&]:top-[68px]">
         <div className="flex items-center gap-3 px-3 py-2.5 sm:px-12 lg:px-20">
-          <div className="relative flex shrink-0 rounded-full bg-cream/5 p-1 ring-1 ring-cream/10">
+          <div className="relative grid shrink-0 grid-cols-2 rounded-full bg-cream/5 p-1 ring-1 ring-cream/10">
+            <span
+              aria-hidden
+              className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-ember transition-transform duration-300 ease-out-strong"
+              style={{ transform: `translateX(${group === 'bere' ? 100 : 0}%)` }}
+            />
             {(['cucina', 'bere'] as const).map((g) => (
               <button key={g} onClick={() => switchGroup(g)} className="relative min-h-10 rounded-full px-4 text-sm font-semibold">
-                {group === g && (
-                  <motion.span layoutId="group-pill" className="absolute inset-0 rounded-full bg-ember" transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }} />
-                )}
                 <span className="relative">{g === 'bere' ? 'Da bere' : 'Cucina'}</span>
               </button>
             ))}
@@ -283,12 +285,9 @@ export default function Menu() {
                 data-chip={s.id}
                 onClick={() => jumpTo(s.id)}
                 className={`relative min-h-10 shrink-0 rounded-full px-3.5 text-sm transition-colors duration-200 ${
-                  active === s.id ? 'text-coal' : 'text-cream/65 hover:text-cream'
+                  active === s.id ? 'bg-cream text-coal' : 'text-cream/65 hover:text-cream'
                 }`}
               >
-                {active === s.id && (
-                  <motion.span layoutId="chip-pill" className="absolute inset-0 rounded-full bg-cream" transition={{ type: 'spring', duration: 0.4, bounce: 0.1 }} />
-                )}
                 <span className="relative">{s.title}</span>
               </button>
             ))}

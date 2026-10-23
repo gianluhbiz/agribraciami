@@ -60,7 +60,12 @@ export function MenuTeaser() {
           </FadeIn>
 
           <FadeIn delay={0.3} className="mt-10 rounded-[2rem] bg-soot p-5 ring-1 ring-cream/10 sm:p-8">
-            <div role="tablist" aria-label="Taglio" className="relative inline-flex rounded-full bg-coal p-1">
+            <div role="tablist" aria-label="Taglio" className="relative inline-grid grid-cols-2 rounded-full bg-coal p-1">
+              <span
+                aria-hidden
+                className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-ember transition-transform duration-300 ease-out-strong"
+                style={{ transform: `translateX(${cut * 100}%)` }}
+              />
               {cuts.map((d, i) => (
                 <button
                   key={d.name}
@@ -69,13 +74,6 @@ export function MenuTeaser() {
                   onClick={() => setCut(i)}
                   className="relative min-h-11 rounded-full px-5 text-sm font-semibold"
                 >
-                  {cut === i && (
-                    <motion.span
-                      layoutId="cut-pill"
-                      className="absolute inset-0 rounded-full bg-ember"
-                      transition={{ type: 'spring', duration: 0.45, bounce: 0.15 }}
-                    />
-                  )}
                   <span className="relative">{d.name}</span>
                 </button>
               ))}

@@ -32,15 +32,15 @@ function TiltCard({ card, i }: { card: (typeof giftCards)[number]; i: number }) 
         className="group block"
       >
         <div
-          className={`relative aspect-[1.6/1] overflow-hidden rounded-[1.6rem] bg-gradient-to-br p-6 text-cream shadow-2xl shadow-black/40 ring-1 ring-white/15 ${card.tone}`}
+          className={`relative min-h-56 overflow-hidden rounded-[1.6rem] bg-gradient-to-br p-5 text-cream sm:aspect-[1.6/1] sm:min-h-0 sm:p-6 shadow-2xl shadow-black/40 ring-1 ring-white/15 ${card.tone}`}
         >
-          <div className="flex h-full flex-col justify-between" style={{ transform: 'translateZ(40px)' }}>
+          <div className="flex h-full min-h-46 flex-col justify-between gap-6 sm:min-h-0">
             <div className="flex items-start justify-between">
               <Logo className="h-12 w-auto" />
               <span className="text-[0.65rem] font-semibold uppercase tracking-[0.25em] opacity-80">Gift card</span>
             </div>
-            <div className="flex items-end justify-between">
-              <span className="font-display text-3xl italic leading-none">{card.name}</span>
+            <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+              <span className="font-display text-[1.7rem] italic leading-tight sm:text-3xl">{card.name}</span>
               <span className="font-display text-4xl leading-none">€ {card.price}</span>
             </div>
           </div>
