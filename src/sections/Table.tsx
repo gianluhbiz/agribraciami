@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, type PanInfo } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { Kicker, Photo, RiseText } from '../components/ui'
 import { easeOut } from '../lib/motion'
@@ -52,39 +52,66 @@ function Polaroid({ s, onOpen, z, raise }: { s: Snap; onOpen: () => void; z: num
   )
 }
 
-function Deck({ onOpen }: { onOpen: (i: number) => void }) {
-  const [order, setOrder] = useState(() => snaps.map((_, i) => i))
-  const swipe = (_: unknown, info: PanInfo) => {
-    if (Math.abs(info.offset.x) > 90 || Math.abs(info.velocity.x) > 450) setOrder((o) => [...o.slice(1), o[0]])
+/**
+ * Phones: a native scroll-snap strip. The browser owns the swipe, so it never
+ * fights vertical scrolling and always lands on exactly one photo.
+ */
+function Strip({ onOpen }: { onOpen: (i: number) => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [idx, setIdx] = useState(0)
+
+  const step = () => {
+    const items = ref.current?.children
+    if (!items || items.length < 2) return 1
+    return (items[1] as HTMLElement).offsetLeft - (items[0] as HTMLElement).offsetLeft
   }
+  const onScroll = () => {
+    const el = ref.current
+    if (el) setIdx(Math.min(snaps.length - 1, Math.max(0, Math.round(el.scrollLeft / step()))))
+  }
+  const to = (n: number) => ref.current?.scrollTo({ left: Math.max(0, Math.min(snaps.length - 1, n)) * step(), behavior: 'smooth' })
+
   return (
-    <div className="relative mx-auto mt-12 aspect-[3/4] w-[78%] max-w-sm">
-      {order
-        .slice(0, 4)
-        .reverse()
-        .map((idx, depth, arr) => {
-          const top = depth === arr.length - 1
-          const s = snaps[idx]
-          return (
-            <motion.figure
-              key={idx}
-              drag={top ? 'x' : false}
-              dragSnapToOrigin
-              onDragEnd={swipe}
-              onTap={() => top && onOpen(idx)}
-              animate={{ rotate: top ? 0 : (arr.length - 1 - depth) * (idx % 2 ? 4 : -4), scale: 1 - (arr.length - 1 - depth) * 0.04 }}
-              transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
-              className="absolute inset-0 touch-pan-y bg-cream p-2.5 pb-12 shadow-2xl shadow-black/50"
-            >
-              <Photo name={s.name} small alt={s.caption} className="h-full w-full" />
-              <figcaption className="absolute inset-x-3 bottom-3.5 font-display text-base italic text-coal/80">{s.caption}</figcaption>
-            </motion.figure>
-          )
-        })}
-      <p className="absolute -bottom-12 inset-x-0 text-center text-sm text-cream/50">
-        <i className="ri-arrow-left-right-line mr-2" aria-hidden />
-        Scorri le foto · {order[0] + 1}/{snaps.length}
-      </p>
+    <div className="mt-8">
+      <div
+        ref={ref}
+        onScroll={onScroll}
+        className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-[11vw] py-6 sm:-mx-12"
+      >
+        {snaps.map((s, i) => (
+          <figure
+            key={s.name}
+            onClick={() => onOpen(i)}
+            className={`relative w-[78vw] max-w-sm shrink-0 snap-center snap-always bg-cream p-2.5 pb-12 shadow-2xl shadow-black/50 transition-transform duration-500 ease-out-strong ${
+              i === idx ? 'scale-100 rotate-0' : `scale-[0.92] ${i % 2 ? 'rotate-3' : '-rotate-3'}`
+            }`}
+          >
+            <Photo name={s.name} small alt={s.caption} className="aspect-[3/4]" />
+            <figcaption className="absolute inset-x-3 bottom-3.5 truncate font-display text-base italic text-coal/80">{s.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+      <div className="mt-4 flex items-center justify-center gap-4 text-sm text-cream/60">
+        <button
+          onClick={() => to(idx - 1)}
+          disabled={idx === 0}
+          aria-label="Foto precedente"
+          className="grid size-11 place-items-center rounded-full bg-cream/10 transition-[opacity,transform] duration-150 active:scale-95 disabled:opacity-30"
+        >
+          <i className="ri-arrow-left-line" aria-hidden />
+        </button>
+        <span className="min-w-14 text-center tabular-nums">
+          {idx + 1} / {snaps.length}
+        </span>
+        <button
+          onClick={() => to(idx + 1)}
+          disabled={idx === snaps.length - 1}
+          aria-label="Foto successiva"
+          className="grid size-11 place-items-center rounded-full bg-cream/10 transition-[opacity,transform] duration-150 active:scale-95 disabled:opacity-30"
+        >
+          <i className="ri-arrow-right-line" aria-hidden />
+        </button>
+      </div>
     </div>
   )
 }
@@ -120,7 +147,7 @@ export function Table() {
           className="mt-5 block font-display font-soft text-[clamp(2.4rem,6vw,5.4rem)] font-medium leading-none tracking-tight"
         />
         <p className="mt-5 text-cream/60">
-          {desktop ? 'Trascina le foto, spostale, toccale per ingrandirle.' : 'Sfoglia le foto con il dito, toccale per ingrandirle.'}
+          {desktop ? 'Trascina le foto, spostale, toccale per ingrandirle.' : 'Scorri le foto di lato, toccale per ingrandirle.'}
         </p>
       </div>
 
@@ -131,9 +158,7 @@ export function Table() {
           ))}
         </div>
       ) : (
-        <div className="pb-16">
-          <Deck onOpen={setOpen} />
-        </div>
+        <Strip onOpen={setOpen} />
       )}
 
       <AnimatePresence>

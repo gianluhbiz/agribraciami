@@ -68,6 +68,14 @@
     font-family: var(--font-sans);
     overflow-x: clip;
   }
+  /* Older Safari has no overflow: clip. Hidden on body alone still propagates to the
+     viewport, so sticky elements keep working. */
+  @supports not (overflow: clip) {
+    body { overflow-x: hidden; }
+  }
+  #root {
+    overflow-x: clip;
+  }
   ::selection {
     background: var(--color-ember);
     color: var(--color-cream);
@@ -85,7 +93,7 @@
 .grain::after {
   content: "";
   position: fixed;
-  inset: -50%;
+  inset: 0;
   z-index: 90;
   pointer-events: none;
   opacity: 0.07;
